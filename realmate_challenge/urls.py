@@ -15,8 +15,16 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from django.conf.urls import handler404
+from utils.swagger import swagger
+from utils.handlers import redirect_404
+
+
+handler404 = redirect_404
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('docs/', swagger, name='schema-swagger-ui'),
+    path('', include('messaging.urls'))
 ]
