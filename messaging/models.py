@@ -24,4 +24,4 @@ class ConversationModel(AbstractModel):
 class MessageModel(AbstractModel):
     content = models.TextField()
     direction = models.CharField(max_length=8, choices=MessageDirection.choices)
-    conversation_id = models.ForeignKey(ConversationModel, on_delete=models.CASCADE)
+    conversation_id = models.ForeignKey(ConversationModel, on_delete=models.CASCADE, related_name='messages')

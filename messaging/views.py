@@ -8,7 +8,8 @@ from django.shortcuts import get_object_or_404
 from .serializers import (
     WebhookEventSerializer,
     WebhookEventConversationDataSerializer,
-    WebhookEventMessageDataSerializer
+    WebhookEventMessageDataSerializer,
+    ConversationSerializer
 )
 from .models import (
     ConversationModel,
@@ -18,13 +19,13 @@ from .enums import (
     WebhookEventType,
     ConversationType,
     ConversationState,
-    MessageDirection
 )
 
 class ConversationView(APIView):
-    def get(self, request, pk, *args, **kwargs):
+    def get(self, request, pk):
         db_conversation = get_object_or_404(ConversationModel, pk=pk)
-        return Response(db_conversation, status=status.HTTP_200_OK)
+        serializer = ConversationSerializer(db_conversation)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
 class WebhookView(GenericAPIView):
     serializer_class = WebhookEventSerializer

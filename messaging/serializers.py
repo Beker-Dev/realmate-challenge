@@ -7,15 +7,19 @@ from .enums import (
     WebhookEventType
 )
 
-class ConversationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ConversationModel
-        fields = ['id', 'type', 'state']
 
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = MessageModel
         fields = ['id', 'content', 'direction', 'conversation_id']
+        
+class ConversationSerializer(serializers.ModelSerializer):
+    messages = MessageSerializer(many=True, read_only=True) 
+
+    class Meta:
+        model = ConversationModel
+        fields = ['id', 'type', 'state', 'messages']
+
 
 class WebhookEventConversationDataSerializer(serializers.Serializer):
     id = serializers.UUIDField()
