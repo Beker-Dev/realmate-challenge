@@ -1,24 +1,6 @@
-from rest_framework import serializers, exceptions
-from .models import (
-    ConversationModel,
-    MessageModel
-)
-from .enums import (
-    WebhookEventType
-)
-
-
-class MessageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = MessageModel
-        fields = ['id', 'content', 'direction', 'conversation_id']
-        
-class ConversationSerializer(serializers.ModelSerializer):
-    messages = MessageSerializer(many=True, read_only=True) 
-
-    class Meta:
-        model = ConversationModel
-        fields = ['id', 'type', 'state', 'messages']
+from rest_framework import serializers
+from messaging.enums import WebhookEventType
+from messaging.serializers.message import MessageSerializer
 
 
 class WebhookEventConversationDataSerializer(serializers.Serializer):
