@@ -8,7 +8,12 @@ from messaging.serializers import ConversationSerializer
 
     
 class ConversationView(APIView):
-    def get(self, request, pk):
+    def get(self, request, pk=None):
+        if not pk:
+            db_conversation_list = ConversationModel.objects.all()
+            serializer = ConversationSerializer(db_conversation_list, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
         db_conversation = get_object_or_404(ConversationModel, pk=pk)
         serializer = ConversationSerializer(db_conversation)
         return Response(serializer.data, status=status.HTTP_200_OK)
