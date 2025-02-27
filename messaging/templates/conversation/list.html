@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversations</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            text-align: center;
+            padding: 10px;
+        }
+        .container {
+            display: flex;
+            width: 95%;
+            height: 80vh;
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .conversation-list {
+            width: 25%;
+            border-right: 1px solid #ddd;
+            overflow-y: auto;
+            background: #fafafa;
+        }
+        .conversation {
+            padding: 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #ddd;
+            transition: background 0.3s ease;
+        }
+        .conversation:hover {
+            background: #e0e0e0;
+        }
+        .conversation.active {
+            background: #e0e0e0;
+        }
+        .messages-container {
+            width: 75%;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            overflow-y: auto;
+            background: #fff;
+        }
+        .messages {
+            flex-grow: 1;
+            display: none;
+        }
+        .messages.active {
+            display: block;
+        }
+        .message {
+            position: relative;
+            background: #e0e0e0;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            max-width: 70%;
+        }
+        .sent {
+            background: #d1ffd1;
+            align-self: flex-end;
+        }
+        .status-closed {
+            color: red;
+            font-weight: bold;
+        }
+        .status-open {
+            color:rgb(0, 140, 255);
+            font-weight: bold;
+        }
+        .last-updated {
+            margin-top: 0.5rem;
+            font-size: 14px;
+        }
+        .message-timestamp {
+            font-size: 11px;
+            position: absolute;
+            bottom: 2px;
+            right: 5px;
+            color: rgb(74, 75, 77);
+        }
+        .swagger-button {
+            position: absolute;
+            top: 1.8rem;
+            right: 3rem;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .swagger-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <script>
+        function showMessages(conversationId) {
+            document.querySelectorAll('.conversation').forEach(conv => conv.classList.remove('active'));
+        
+            const clickedConversation = document.getElementById('conversation-' + conversationId);
+            if (clickedConversation) {
+                clickedConversation.classList.add('active');
+            }
+
+            document.querySelectorAll('.messages').forEach(msg => msg.classList.remove('active'));
+        
+            const selectedMessages = document.getElementById('messages-' + conversationId);
+            if (selectedMessages) {
+                selectedMessages.classList.add('active');
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Conversations</h1>
+    <a href="{% url 'schema-swagger-ui' %}" class="swagger-button" target="_blank">Docs</a>
+    <div class="container">
+        <div class="conversation-list">
+            {% for conversation in object_list %}
+                <div id="conversation-{{conversation.id}}" class="conversation" onclick="showMessages('{{ conversation.id }}')">
+                    <h2>{{ conversation.id }}</h2>
+                    <span class="{% if conversation.state == 'CLOSED' %}status-closed{% elif conversation.state == 'OPEN' %}status-open{% endif %}">
+                        {{ conversation.state }}
+                    </span>
+                    <div class="last-updated">
+                        {% with last_message=conversation.messages.last %}
+                            {% if last_message and last_message.updated_at > conversation.updated_at %}
+                                {{ last_message.updated_at|date:"d/m/Y H:i" }}
+                            {% else %}
+                                {{ conversation.updated_at|date:"d/m/Y H:i" }}
+                            {% endif %}
+                        {% endwith %}
+                    </div>                    
+                </div>
+            {% empty %}
+                <p>Nenhuma conversa disponível.</p>
+            {% endfor %}
+        </div>
+
+        <div class="messages-container">
+            {% for conversation in object_list %}
+                <div class="messages" id="messages-{{ conversation.id }}">
+                    {% for message in conversation.messages.all %}
+                        <div class="message {% if message.direction == 'SENT' %}sent{% endif %}">
+                            <strong>{{ message.direction }}</strong>: {{ message.content }}
+                            <span class="message-timestamp">
+                                {{ message.created_at|date:"H:i" }}
+                            </span>
+                        </div>
+                    {% empty %}
+                        <p>Sem mensagens ainda.</p>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
