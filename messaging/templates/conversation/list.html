@@ -108,6 +108,9 @@
         .swagger-button:hover {
             background-color: #0056b3;
         }
+        .conversation-title {
+            font-size: 20px
+        }
     </style>
     <script>
         function showMessages(conversationId) {
@@ -134,7 +137,7 @@
         <div class="conversation-list">
             {% for conversation in object_list %}
                 <div id="conversation-{{conversation.id}}" class="conversation" onclick="showMessages('{{ conversation.id }}')">
-                    <h2>{{ conversation.id }}</h2>
+                    <h2 class="conversation-title">{{ conversation.id }}</h2>
                     <span class="{% if conversation.state == 'CLOSED' %}status-closed{% elif conversation.state == 'OPEN' %}status-open{% endif %}">
                         {{ conversation.state }}
                     </span>
